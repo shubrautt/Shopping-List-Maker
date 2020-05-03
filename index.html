@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>List Maker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            font-size: 18px;
+        }
+
+        .main {
+            position: absolute;
+            width: 100%;
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main .appName {
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .appName {
+            width: 100%;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-family: cursive;
+        }
+
+        .additem {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .additem label {
+            font-size: 1rem;
+        }
+
+        .additem input {
+            margin: 0.5rem 0;  
+            border-radius: 1rem;
+            border: 1px solid black;
+            height: 1.5rem;
+            text-align: center;
+            outline: none;
+        }
+
+        #quantity {
+            margin: 0;
+            border-radius: 1rem;
+            border: none;
+            text-align: center;
+            outline: none;
+        }
+
+        .additem select {
+            width: 3rem;
+            height: 1.5rem;
+            outline: none;
+            border: none;
+            border-radius: 1rem;
+        }
+
+        .addquantity {
+            border-radius: 1rem;
+            border: 1px solid black;
+        }
+       #quantityName{
+           background: transparent;
+       }
+        .subbtn {
+            width: 90px;
+            border-radius: 3rem;
+            border: 1px solid black;
+            margin: 0.5rem 0px;
+            padding: 0.2rem 0px;
+            outline: none;
+            background-color: #009b77;
+            color: white;
+        }
+
+        .listhead {
+            position: relative;
+            font-size: 1.5rem;
+        }
+
+        #showlist {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .showitem {
+            display: flex;
+            margin: 1rem 1.5rem 1rem 1.5rem;
+            flex-direction: column;
+            border: 1px solid black;
+            background-color: whitesmoke;
+            color: black;
+            font-size: 1rem;
+            padding: 1.5rem 6.5rem;
+        }
+        .delitem{
+            margin-top: 0.5rem;
+            width: 6rem;
+            border-radius: 3rem;
+            border: 1px solid black;
+            background-color: #009b77;
+            color: white;
+        }
+        #checkbox{
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        }
+        #checkbox input{
+        margin-left: 0.5rem;
+        width: 1.2rem;
+        height: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main">
+        <p class="appName">Shopping list Maker</p>
+        <div class="additem">
+            <form>
+                <label>Add item name:</label><br>
+                <input type="text" placeholder="Enter item name" id="itemName">
+                <div class="addquantity">
+                    <input type="number" placeholder="Enter quantity" id="quantity">
+                    <select id="quantityName">
+                        <option value="pcs" selected>pcs</option>
+                        <option value="kg">kg</option>
+                        <option value="gm">gm</option>
+                    </select>
+                </div>
+                <button type="submit" class="subbtn" id="additem">Add Item</button>
+            </form>
+        </div>
+        <!-- //show list -->
+        <p class="listhead">Your List:-</p>
+        <div id="showlist">
+
+        </div>
+</body>
+<script>
+    //add item to local storage
+    showitem();
+    let additem = document.getElementById("additem");
+    additem.addEventListener("click", function (e) {
+        let itemName = document.getElementById("itemName");
+        let quantity = document.getElementById("quantity");
+        let quantityName = document.getElementById("quantityName");
+        let item = localStorage.getItem("item");
+        if (item == null) {
+            itemObj = [];
+        }
+        else {
+            itemObj = JSON.parse(item, quantity);
+        }
+        let myobj = {
+            name: itemName.value,
+            quantity: quantity.value,
+            quantityName: quantityName.value
+        }
+        itemObj.push(myobj);
+        localStorage.setItem("item", JSON.stringify(itemObj));
+        itemName.value = "";
+        quantity.value = "";
+        quantityName.value = "pcs";
+        console.log(itemObj);
+        showitem();
+    })
+    function showitem() {
+        let item = localStorage.getItem("item");
+        if (item == null) {
+            itemObj = [];
+        }
+        else {
+            itemObj = JSON.parse(item);
+        }
+        let html = "";
+        itemObj.forEach(function (element, index) {
+            html += `<div class="showitem"> 
+            <p>Item:- ${index + 1}</p> 
+            <span>Item name:- ${element.name}</span> 
+            <span>quantity:- ${element.quantity} ${element.quantityName} </span>
+            <button id="${index}" class="delitem" onclick="deleteitem(this.id)">Delete item</button>
+            </div>`;
+
+        });
+        let itemElm = document.getElementById("showlist");
+        if (itemObj.lenght != 0) {
+            itemElm.innerHTML = html;
+        } else {
+            itemElm.innerHTML = 'Noting is show! use "Add list" section above to add items in list';
+        }
+    }
+    //delete items
+    function deleteitem(index){
+        let item = localStorage.getItem("item");
+        if (item == null) {
+            itemObj = [];
+        }
+        else {
+            itemObj = JSON.parse(item);
+        }
+        itemObj.splice(index, 1);
+        localStorage.setItem("item", JSON.stringify(itemObj));
+        showitem();
+    }
+</script>
+
+</html>
